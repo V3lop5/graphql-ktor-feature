@@ -6,7 +6,6 @@ import com.expediagroup.graphql.server.execution.GraphQLRequestHandler
 import com.expediagroup.graphql.server.execution.GraphQLServer
 import com.expediagroup.graphql.toSchema
 import com.google.gson.Gson
-import feature.subscriptions.*
 import io.ktor.application.*
 import io.ktor.util.*
 import v3.ktor.graphql.subscriptions.*
