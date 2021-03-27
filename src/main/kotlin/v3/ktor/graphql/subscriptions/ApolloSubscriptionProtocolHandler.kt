@@ -66,6 +66,8 @@ class ApolloSubscriptionProtocolHandler(
         sessionState.terminateSession(session)
     }
 
+    fun hasContext(session: WebSocketSession) = sessionState.getContext(session) != null
+
 
     @Suppress("Detekt.TooGenericExceptionCaught")
     private fun convertToMessageOrNull(payload: String): SubscriptionOperationMessage? {
