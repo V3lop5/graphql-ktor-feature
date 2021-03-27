@@ -4,17 +4,18 @@ import com.expediagroup.graphql.execution.DefaultGraphQLContext
 import com.expediagroup.graphql.execution.GraphQLContext
 import com.expediagroup.graphql.types.GraphQLRequest
 import com.google.gson.Gson
-import v3.ktor.graphql.KtorGraphQLContextFactory
-import v3.ktor.graphql.subscriptions.SubscriptionOperationMessage.ClientMessages.*
-import v3.ktor.graphql.subscriptions.SubscriptionOperationMessage.ServerMessages.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.request.*
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import org.slf4j.LoggerFactory
+import v3.ktor.graphql.KtorGraphQLContextFactory
+import v3.ktor.graphql.subscriptions.SubscriptionOperationMessage.ClientMessages.*
+import v3.ktor.graphql.subscriptions.SubscriptionOperationMessage.ServerMessages.*
 
 /**
  * Implementation of the `graphql-ws` protocol defined by Apollo
@@ -175,7 +176,16 @@ class ApolloSubscriptionProtocolHandler(
         operationMessage: SubscriptionOperationMessage,
         session: WebSocketSession
     ): Flow<SubscriptionOperationMessage> {
-        val context = sessionState.getContext(session)
+        var context = sessionState.getContext(session)
+
+        if (context == null) {
+            var maxRetries = 5
+            while (maxRetries > 0 && context == null) {
+                maxRetries--
+                delay(100)
+                context = sessionState.getContext(session)
+            }
+        }
 
         // If we do not have a context, that means the init message was never sent
         return if (context != null) {
