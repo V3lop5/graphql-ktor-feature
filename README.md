@@ -45,9 +45,9 @@ For more example take a look at their documentation.
 Install the feature in `Application.module()`:
 ```kotlin
 install(GraphQL) {
-    supportedPackages += "jetzt.doppelkopf.server" // add packages 
+    supportedPackages += "jetzt.doppelkopf.server" // add packages from your classes needed or returned from graphql endpoints. (otherwise you will recive an error.)
 
-    queries += TopLevelObject(HelloQueryService()) // add query service
+    queries += TopLevelObject(HelloQueryService()) // add query service 
 
     // mutations += TopLevelObject(...)
     // subscriptions += TopLevelObject(...)
@@ -67,17 +67,14 @@ data class MyContext(val userId: Int, val customHeader: String?) : GraphQLContex
 
 object MyContextFactory : KtorGraphQLContextFactory<MyContext> {
 
-    // TODO Remove DevMode
-    var isDev = false
-
-    override fun generateContext(request: ApplicationRequest): DokoContext {
+    override fun generateContext(request: ApplicationRequest): MyContext {
 
         val userId = 42 // Parse Request to user
         
         // Parse any headers from the Ktor request
         val customHeader: String? = request.headers["my-custom-header"]
 
-        return MyContext(userId, customHeader)
+        return MyContext(userId, customHeader) // return custom context 
     }
 }
 ```
